@@ -28,27 +28,15 @@ public class FacultyService {
         return facultyRepository.findAll();
     }
 
+    public List<Faculty> findFacultyByNameOrColor(String query) {
+        return facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(query, query);
+    }
+
     public Faculty updateFaculty(Faculty faculty) {
-        if (facultyRepository.existsById(faculty.getId())) {
-            return facultyRepository.save(faculty);
-        }
-        return null;
+        return facultyRepository.save(faculty);
     }
 
-    public boolean deleteFaculty(Long id) {
-        if (facultyRepository.existsById(id)) {
-            facultyRepository.deleteById(id);
-            return true;
-        }
-        return false;
-    }
-
-    // Дополнительные методы (опционально)
-    public List<Faculty> findByName(String name) {
-        return facultyRepository.findByName(name);
-    }
-
-    public List<Faculty> findByColor(String color) {
-        return facultyRepository.findByColor(color);
+    public void deleteFaculty(Long id) {
+        facultyRepository.deleteById(id);
     }
 }

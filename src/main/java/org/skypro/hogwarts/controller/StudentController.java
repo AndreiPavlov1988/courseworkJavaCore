@@ -1,5 +1,6 @@
 package org.skypro.hogwarts.controller;
 
+import org.skypro.hogwarts.model.Faculty;
 import org.skypro.hogwarts.model.Student;
 import org.skypro.hogwarts.service.StudentService;
 import org.springframework.http.HttpStatus;
@@ -36,33 +37,32 @@ public class StudentController {
         return studentService.getAllStudents();
     }
 
+    // НОВЫЙ ЭНДПОИНТ: получение студентов по возрасту
+    @GetMapping("/age-between")
+    public List<Student> getStudentsByAgeBetween(
+            @RequestParam int minAge,
+            @RequestParam int maxAge) {
+        return studentService.getStudentsByAgeBetween(minAge, maxAge);
+    }
+
+    // Получить факультет студента
+    @GetMapping("/{id}/faculty")
+    public ResponseEntity<Faculty> getStudentFaculty(@PathVariable Long id) {
+        return studentService.getStudent(id)
+                .map(Student::getFaculty)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Student> updateStudent(@PathVariable Long id, @RequestBody Student student) {
         student.setId(id);
-        Student updated = studentService.updateStudent(student);
-        return updated != null
-                ? ResponseEntity.ok(updated)
-                : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(studentService.updateStudent(student));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
-        if (studentService.deleteStudent(id)) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    // Дополнительные эндпоинты (опционально)
-    @GetMapping("/name/{name}")
-    public List<Student> findByName(@PathVariable String name) {
-        return studentService.findByName(name);
-    }
-
-    @GetMapping("/age-between")
-    public List<Student> findByAgeBetween(
-            @RequestParam int minAge,
-            @RequestParam int maxAge) {
-        return studentService.findByAgeBetween(minAge, maxAge);
+        studentService.deleteStudent(id);
+        return ResponseEntity.noContent().build();
     }
 }

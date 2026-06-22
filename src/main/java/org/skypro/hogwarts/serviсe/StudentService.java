@@ -28,27 +28,15 @@ public class StudentService {
         return studentRepository.findAll();
     }
 
-    public Student updateStudent(Student student) {
-        if (studentRepository.existsById(student.getId())) {
-            return studentRepository.save(student);
-        }
-        return null;
-    }
-
-    public boolean deleteStudent(Long id) {
-        if (studentRepository.existsById(id)) {
-            studentRepository.deleteById(id);
-            return true;
-        }
-        return false;
-    }
-
-    // Дополнительные методы (опционально)
-    public List<Student> findByName(String name) {
-        return studentRepository.findByName(name);
-    }
-
-    public List<Student> findByAgeBetween(int minAge, int maxAge) {
+    public List<Student> getStudentsByAgeBetween(int minAge, int maxAge) {
         return studentRepository.findByAgeBetween(minAge, maxAge);
+    }
+
+    public Student updateStudent(Student student) {
+        return studentRepository.save(student);
+    }
+
+    public void deleteStudent(Long id) {
+        studentRepository.deleteById(id);
     }
 }

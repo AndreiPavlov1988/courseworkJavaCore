@@ -1,6 +1,7 @@
 package org.skypro.hogwarts.controller;
 
 import org.skypro.hogwarts.model.Faculty;
+import org.skypro.hogwarts.model.Student;
 import org.skypro.hogwarts.service.FacultyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,31 +37,29 @@ public class FacultyController {
         return facultyService.getAllFaculties();
     }
 
+    // НОВЫЙ ЭНДПОИНТ: поиск факультета по имени или цвету
+    @GetMapping("/search")
+    public List<Faculty> searchFaculty(@RequestParam String query) {
+        return facultyService.findFacultyByNameOrColor(query);
+    }
+    // Получить студентов факультета
+    @GetMapping("/{id}/students")
+    public ResponseEntity<List<Student>> getFacultyStudents(@PathVariable Long id) {
+        return facultyService.getFaculty(id)
+                .map(Faculty::getStudents)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Faculty> updateFaculty(@PathVariable Long id, @RequestBody Faculty faculty) {
         faculty.setId(id);
-        Faculty updated = facultyService.updateFaculty(faculty);
-        return updated != null
-                ? ResponseEntity.ok(updated)
-                : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(facultyService.updateFaculty(faculty));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFaculty(@PathVariable Long id) {
-        if (facultyService.deleteFaculty(id)) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    // Дополнительные эндпоинты (опционально)
-    @GetMapping("/name/{name}")
-    public List<Faculty> findByName(@PathVariable String name) {
-        return facultyService.findByName(name);
-    }
-
-    @GetMapping("/color/{color}")
-    public List<Faculty> findByColor(@PathVariable String color) {
-        return facultyService.findByColor(color);
+        facultyService.deleteFaculty(id);
+        return ResponseEntity.noContent().build();
     }
 }
