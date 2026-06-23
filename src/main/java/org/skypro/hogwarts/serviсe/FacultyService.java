@@ -1,11 +1,11 @@
 package org.skypro.hogwarts.service;
 
 import org.skypro.hogwarts.model.Faculty;
+import org.skypro.hogwarts.model.Student;
 import org.skypro.hogwarts.repository.FacultyRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class FacultyService {
@@ -20,8 +20,9 @@ public class FacultyService {
         return facultyRepository.save(faculty);
     }
 
-    public Optional<Faculty> getFaculty(Long id) {
-        return facultyRepository.findById(id);
+    public Faculty getFaculty(Long id) {
+        return facultyRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Факультет с ID " + id + " не найден"));
     }
 
     public List<Faculty> getAllFaculties() {
@@ -29,7 +30,15 @@ public class FacultyService {
     }
 
     public List<Faculty> findFacultyByNameOrColor(String query) {
+        if (query == null || query.isBlank()) {
+            throw new IllegalArgumentException("Поисковый запрос не может быть пустым");
+        }
         return facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(query, query);
+    }
+
+    public List<Student> getFacultyStudents(Long facultyId) {
+        Faculty faculty = getFaculty(facultyId);
+        return faculty.getStudents();
     }
 
     public Faculty updateFaculty(Faculty faculty) {
