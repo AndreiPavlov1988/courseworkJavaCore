@@ -9,8 +9,12 @@ import java.util.List;
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long> {
 
-    // Дополнительные методы поиска (опционально)
-    List<Student> findByName(String name);
-
+    // Найти студентов по возрасту между min и max
     List<Student> findByAgeBetween(int minAge, int maxAge);
+
+    // Найти студентов по имени (игнорируя регистр)
+    List<Student> findByNameContainingIgnoreCase(String name);
+
+    // Найти студента по ID факультета
+    List<Student> findByFacultyId(Long facultyId);
 }
