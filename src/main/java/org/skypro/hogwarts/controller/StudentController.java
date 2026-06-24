@@ -3,6 +3,7 @@ package org.skypro.hogwarts.controller;
 import org.skypro.hogwarts.model.Faculty;
 import org.skypro.hogwarts.model.Student;
 import org.skypro.hogwarts.service.StudentService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class StudentController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)  // ← добавить
     public Student createStudent(@RequestBody Student student) {
         return studentService.addStudent(student);
     }
