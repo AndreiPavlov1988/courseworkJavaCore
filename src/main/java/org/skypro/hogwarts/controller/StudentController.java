@@ -18,8 +18,9 @@ public class StudentController {
         this.studentService = studentService;
     }
 
+    // Существующие эндпоинты
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)  // ← добавить
+    @ResponseStatus(HttpStatus.CREATED)
     public Student createStudent(@RequestBody Student student) {
         return studentService.addStudent(student);
     }
@@ -53,7 +54,30 @@ public class StudentController {
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteStudent(@PathVariable Long id) {
         studentService.deleteStudent(id);
+    }
+
+    // ================================================
+    // НОВЫЕ ЭНДПОИНТЫ ДЛЯ ШАГА 1
+    // ================================================
+
+    // 1. Количество всех студентов
+    @GetMapping("/count")
+    public long getStudentsCount() {
+        return studentService.getStudentsCount();
+    }
+
+    // 2. Средний возраст студентов
+    @GetMapping("/average-age")
+    public double getAverageAge() {
+        return studentService.getAverageAge();
+    }
+
+    // 3. Последние 5 студентов
+    @GetMapping("/last-five")
+    public List<Student> getLastFiveStudents() {
+        return studentService.getLastFiveStudents();
     }
 }
