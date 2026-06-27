@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- ============================================= -->
+    <!-- МИГРАЦИЯ: Добавление индексов -->
+    <!-- Дата: 2026-06-26 -->
+    <!-- Автор: student -->
+    <!-- ============================================= -->
+
+    <changeSet id="2026-06-26-add-indexes" author="student">
+
+        <!-- 1. Индекс для поиска по имени студента -->
+        <sql>
+            CREATE INDEX IF NOT EXISTS idx_student_name ON students (name);
+        </sql>
+
+        <!-- 2. Индекс для поиска по названию и цвету факультета -->
+        <sql>
+            CREATE INDEX IF NOT EXISTS idx_faculty_name_color ON faculties (name, color);
+        </sql>
+
+        <!-- Дополнительно: индекс для поиска по возрасту (для оптимизации) -->
+        <sql>
+            CREATE INDEX IF NOT EXISTS idx_student_age ON students (age);
+        </sql>
+
+    </changeSet>
+
+</databaseChangeLog>
