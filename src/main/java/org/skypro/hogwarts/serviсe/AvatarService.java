@@ -3,6 +3,8 @@ package org.skypro.hogwarts.service;
 import org.skypro.hogwarts.model.Avatar;
 import org.skypro.hogwarts.model.Student;
 import org.skypro.hogwarts.repository.AvatarRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,10 +19,10 @@ import java.nio.file.Paths;
 @Service
 public class AvatarService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AvatarService.class);
+
     private final AvatarRepository avatarRepository;
     private final StudentService studentService;
-
-    // Путь для хранения аватарок
     private final Path avatarsDir = Paths.get("avatars");
 
     public AvatarService(AvatarRepository avatarRepository, StudentService studentService) {
@@ -28,29 +30,31 @@ public class AvatarService {
         this.studentService = studentService;
     }
 
-    /**
-     * Загрузка аватарки для студента
-     */
     public Avatar uploadAvatar(Long studentId, MultipartFile file) throws IOException {
+        logger.info("Was invoked method for upload avatar for student id: {}", studentId);
+        logger.debug("File details: name={}, size={}, type={}",
+                file.getOriginalFilename(), file.getSize(), file.getContentType());
+
         Student student = studentService.getStudent(studentId);
 
-        // Создаем папку, если её нет
         if (!Files.exists(avatarsDir)) {
+            logger.debug("Creating avatars directory: {}", avatarsDir);
             Files.createDirectories(avatarsDir);
         }
 
-        // Генерируем имя файла
         String fileName = studentId + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
         Path filePath = avatarsDir.resolve(fileName);
 
-        // Сохраняем файл на диск
         Files.write(filePath, file.getBytes());
+        logger.debug("File saved to: {}", filePath);
 
-        // Создаем или обновляем аватарку
         Avatar avatar = avatarRepository.findByStudentId(studentId);
         if (avatar == null) {
+            logger.debug("Creating new avatar for student id: {}", studentId);
             avatar = new Avatar();
             avatar.setStudent(student);
+        } else {
+            logger.debug("Updating existing avatar for student id: {}", studentId);
         }
 
         avatar.setFilePath(filePath.toString());
@@ -58,21 +62,31 @@ public class AvatarService {
         avatar.setMediaType(file.getContentType());
         avatar.setData(file.getBytes());
 
-        return avatarRepository.save(avatar);
+        Avatar savedAvatar = avatarRepository.save(avatar);
+        logger.info("Avatar saved for student id: {}", studentId);
+        return savedAvatar;
     }
 
-    /**
-     * Получение аватарки по ID студента
-     */
     public Avatar getAvatarByStudentId(Long studentId) {
-        return avatarRepository.findByStudentId(studentId);
+        logger.info("Was invoked method for get avatar by student id: {}", studentId);
+        Avatar avatar = avatarRepository.findByStudentId(studentId);
+        if (avatar == null) {
+            logger.warn("Avatar not found for student id: {}", studentId);
+        } else {
+            logger.debug("Avatar found for student id: {}, size: {}", studentId, avatar.getFileSize());
+        }
+        return avatar;
     }
 
-    /**
-     * Получение всех аватарок с пагинацией
-     */
     public Page<Avatar> getAllAvatars(int page, int size) {
+        logger.info("Was invoked method for get all avatars with pagination: page={}, size={}", page, size);
+        if (page < 0 || size <= 0) {
+            logger.warn("Invalid pagination parameters: page={}, size={}", page, size);
+            throw new IllegalArgumentException("Page must be >= 0 and size must be > 0");
+        }
         Pageable pageable = PageRequest.of(page, size);
-        return avatarRepository.findAll(pageable);
+        Page<Avatar> avatars = avatarRepository.findAll(pageable);
+        logger.debug("Found {} avatars out of {}", avatars.getNumberOfElements(), avatars.getTotalElements());
+        return avatars;
     }
 }
