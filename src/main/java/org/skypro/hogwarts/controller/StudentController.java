@@ -80,4 +80,12 @@ public class StudentController {
     public List<Student> getLastFiveStudents() {
         return studentService.getLastFiveStudents();
     }
+
+    @GetMapping("/names-starting-with-a")
+    public List<String> getStudentNamesStartingWithA() {
+        return studentService.getStudentNamesStartingWithA();}
+
+    @GetMapping("/average-age-stream")
+    public double getAverageAgeStream() {
+        return studentService.getAverageAgeStream();}
 }
