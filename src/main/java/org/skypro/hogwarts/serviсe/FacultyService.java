@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -79,5 +80,15 @@ public class FacultyService {
         }
         facultyRepository.deleteById(id);
         logger.info("Faculty with id {} deleted successfully", id);
+    }
+
+    public String getLongestFacultyName() {
+        logger.info("Was invoked method for get longest faculty name");
+
+        return facultyRepository.findAll().stream()
+                .map(Faculty::getName)
+                .filter(name -> name != null && !name.isEmpty())
+                .max(Comparator.comparingInt(String::length))
+                .orElse("Нет факультетов");
     }
 }
