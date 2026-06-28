@@ -88,4 +88,15 @@ public class StudentController {
     @GetMapping("/average-age-stream")
     public double getAverageAgeStream() {
         return studentService.getAverageAgeStream();}
+
+    @GetMapping("/print-parallel")
+    public String printStudentsParallel() {
+        studentService.printStudentsParallel();
+        return "Параллельный вывод студентов выполнен. Проверьте консоль.";
+    }
+    @GetMapping("/print-synchronized")
+    public String printStudentsSynchronized() {
+        studentService.printStudentsSynchronized();
+        return "Синхронизированный вывод студентов выполнен. Проверьте консоль.";
+    }
 }
